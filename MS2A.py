@@ -5,12 +5,12 @@ import time
 from yaml.loader import SafeLoader
 import csv
 
-file2A = open("LogFile1.txt", "w")
+file2A = open("Log3.txt", "w")
 
 
 def waitingTime(typeName, taskName, input, secs):
-    ct1 = str(datetime.datetime.now())
-    string = ct1 + ';' + typeName + '.' + taskName + ' Executing TimeFunction(' + input + ',' + secs + ')'
+    ts1 = str(datetime.datetime.now())
+    string = ts1 + ';' + typeName + '.' + taskName + ' Executing TimeFunction(' + input + ',' + secs + ')'
     file2A.write(string + '\n')
     time.sleep(int(secs))
 
@@ -25,11 +25,11 @@ def func(typeName, activity, name):
             flag = True
             if 'Condition' in activity:
                 val = int(activity['Condition'][-1])
-                sign = activity['Condition'][-3]
-                if sign == '>':
+                symbol = activity['Condition'][-3]
+                if symbol == '>':
                     if noOfDefects < val:
                         flag = False
-                if sign == '<':
+                if symbol == '<':
                     if noOfDefects > val:
                         flag = False
             if flag:
@@ -40,32 +40,43 @@ def func(typeName, activity, name):
                 ts1 = str(datetime.datetime.now())
                 string = ts1 + ';' + typeName + '.' + name + ' Exit'
                 file2A.write(string + '\n')
+            else:
+                ts1 = str(datetime.datetime.now())
+                string = ts1 + ';' + typeName + '.' + name + ' Entry'
+                file2A.write(string + '\n')
+                ts1 = str(datetime.datetime.now())
+                string = ts1 + ';' + typeName + '.' + name + ' Skipped'
+                file2A.write(string + '\n')
+                ts1 = str(datetime.datetime.now())
+                string = ts1 + ';' + typeName + '.' + name + ' Exit'
+                file2A.write(string + '\n')
+
         else:
             flag = True
             if 'Condition' in activity:
                 val = int(activity['Condition'][-1])
-                sign = activity['Condition'][-3]
-                if sign == '>':
+                symbol = activity['Condition'][-3]
+                if symbol == '>':
                     if noOfDefects < val:
                         flag = False
-                if sign == '<':
+                if symbol == '<':
                     if noOfDefects > val:
                         flag = False
             if True:
                 if flag:
-                    ct1 = str(datetime.datetime.now())
-                    string = ct1 + ';' + typeName + '.' + name + ' Entry'
+                    ts1 = str(datetime.datetime.now())
+                    string = ts1 + ';' + typeName + '.' + name + ' Entry'
                     file2A.write(string + '\n')
                     filename = activity['Inputs']['Filename']
-                    string = ct1 + ';' + typeName + '.' + name + ' Executing DataLoad(' + filename + ')'
+                    string = ts1 + ';' + typeName + '.' + name + ' Executing DataLoad(' + filename + ')'
                     file2A.write(string + '\n')
                     with open(filename, 'r', newline='') as fp:
-                        data = csv.reader(file)
+                        data = csv.reader(fp)
                         for _ in data:
                             noOfDefects += 1
                     fp.close()
-                    ct1 = str(datetime.datetime.now())
-                    string = ct1 + ';' + typeName + '.' + name + ' Exit'
+                    ts1 = str(datetime.datetime.now())
+                    string = ts1 + ';' + typeName + '.' + name + ' Exit'
                     file2A.write(string + '\n')
 
     else:
@@ -95,10 +106,10 @@ def seq(typeName, activities):
                 ts1 = str(datetime.datetime.now())
                 string = ts1 + ';' + typeName + '.' + i + ' Entry'
                 file2A.write(string + '\n')
-                waitingTime(typeName, i, activities[i]['Inputs']['ExecutionTime'],
-                            activities[i]['Inputs']['FunctionInput'])
-                ct2 = str(datetime.datetime.now())
-                string1 = ct2 + ';' + typeName + '.' + i + ' Exit'
+                waitingTime(typeName, i, activities[i]['Inputs']['FunctionInput'],
+                            activities[i]['Inputs']['ExecutionTime'])
+                ts1 = str(datetime.datetime.now())
+                string1 = ts1 + ';' + typeName + '.' + i + ' Exit'
                 file2A.write(string1 + '\n')
 
             elif activities[i]['Function'] == "DataLoad":
@@ -116,13 +127,13 @@ def seq(typeName, activities):
                     if flag:
                         ts1 = str(datetime.datetime.now())
                         string = ts1 + ';' + typeName + '.' + i + ' Entry'
-                        file1.write(string + '\n')
+                        file2A.write(string + '\n')
                         filename = activities[i]['Inputs']['Filename']
                         string = ts1 + ';' + typeName + '.' + i + ' Executing DataLoad(' + filename + ')'
-                        file1.write(string + '\n')
+                        file2A.write(string + '\n')
                         with open(filename, 'r', newline='') as file:
                             data = csv.reader(file)
-                            for row in data:
+                            for _ in data:
                                 noOfDefects += 1
                         file.close()
                         ts1 = str(datetime.datetime.now())
